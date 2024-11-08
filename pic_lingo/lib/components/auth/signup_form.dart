@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class SignupForm extends StatefulWidget {
@@ -30,7 +31,8 @@ class _SignupFormState extends State<SignupForm> {
               labelText: '使用者名稱',
               prefixIcon: Icon(Icons.person),
               filled: true,
-              fillColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.1),
+              fillColor:
+                  Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.1),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -54,7 +56,8 @@ class _SignupFormState extends State<SignupForm> {
               labelText: '電子郵件',
               prefixIcon: Icon(Icons.email),
               filled: true,
-              fillColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.1),
+              fillColor:
+                  Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.1),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -77,6 +80,7 @@ class _SignupFormState extends State<SignupForm> {
             controller: _passwordController,
             decoration: InputDecoration(
               labelText: '密碼',
+              helperText: '至少8個字元，包含大小寫字母和數字',
               prefixIcon: const Icon(Icons.lock),
               suffixIcon: IconButton(
                 icon: Icon(
@@ -89,7 +93,8 @@ class _SignupFormState extends State<SignupForm> {
                 },
               ),
               filled: true,
-              fillColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.1),
+              fillColor:
+                  Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.1),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -99,8 +104,14 @@ class _SignupFormState extends State<SignupForm> {
               if (value == null || value.isEmpty) {
                 return '請輸入密碼';
               }
-              if (value.length < 6) {
-                return '密碼長度至少需要6個字元';
+              if (value.length < 8) {
+                return '密碼長度至少需要8個字元';
+              }
+              final hasUpperCase = value.contains(RegExp(r'[A-Z]'));
+              final hasLowerCase = value.contains(RegExp(r'[a-z]'));
+              final hasNumber = value.contains(RegExp(r'[0-9]'));
+              if (!hasUpperCase || !hasLowerCase || !hasNumber) {
+                return '密碼必須包含大小寫字母和數字';
               }
               return null;
             },
@@ -115,7 +126,9 @@ class _SignupFormState extends State<SignupForm> {
               prefixIcon: const Icon(Icons.lock),
               suffixIcon: IconButton(
                 icon: Icon(
-                  _obscureConfirmPassword ? Icons.visibility : Icons.visibility_off,
+                  _obscureConfirmPassword
+                      ? Icons.visibility
+                      : Icons.visibility_off,
                 ),
                 onPressed: () {
                   setState(() {
@@ -124,7 +137,8 @@ class _SignupFormState extends State<SignupForm> {
                 },
               ),
               filled: true,
-              fillColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.1),
+              fillColor:
+                  Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.1),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -152,6 +166,7 @@ class _SignupFormState extends State<SignupForm> {
                 foregroundColor: Theme.of(context).colorScheme.onPrimary,
               ),
               onPressed: _isLoading ? null : _handleSignup,
+              // onPressed: _isLoading ? null : () {},
               child: _isLoading
                   ? const SizedBox(
                       height: 20,
@@ -185,11 +200,37 @@ class _SignupFormState extends State<SignupForm> {
       });
 
       try {
-        // TODO: 實作註冊 API 呼叫
-        await Future.delayed(const Duration(seconds: 2)); // 模擬 API 呼叫
+        final dio = Dio();
+        final response = await dio.post(
+          'http://localhost:3000/api/auth/register',
+          data: {
+            'email': _emailController.text,
+            'password': _passwordController.text,
+            'username': _usernameController.text,
+          },
+        );
+
+        if (response.statusCode == 201) {
+          // 儲存 token
+          final token = response.data['token'];
+          // TODO: 儲存 token 到 local storage
+
+          if (mounted) {
+            // 註冊成功後導向首頁
+            Navigator.pushReplacementNamed(context, '/home');
+          }
+        }
+      } on DioException catch (e) {
         if (mounted) {
-          // 註冊成功後導向首頁
-          Navigator.pushReplacementNamed(context, '/home');
+          String errorMessage = '註冊失敗';
+
+          if (e.response?.data != null && e.response?.data['error'] != null) {
+            errorMessage = e.response?.data['error'];
+          }
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(errorMessage)),
+          );
         }
       } catch (e) {
         if (mounted) {
@@ -215,4 +256,4 @@ class _SignupFormState extends State<SignupForm> {
     _confirmPasswordController.dispose();
     super.dispose();
   }
-} 
+}
