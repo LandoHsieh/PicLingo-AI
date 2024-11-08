@@ -13,6 +13,7 @@ class CameraPage extends StatefulWidget {
 
 class _CameraPageState extends State<CameraPage> {
   XFile? _imageFile;
+  final ImagePicker _picker = ImagePicker();
   CameraController? _controller;
   bool _isCameraInitialized = false;
 
@@ -22,6 +23,20 @@ class _CameraPageState extends State<CameraPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeCamera();
     });
+  }
+
+  Future<void> pickImage() async {
+    try {
+      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      if (image != null) {
+        setState(() {
+          _imageFile = image;
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("選擇圖片時發生錯誤: $e")));
+    }
   }
 
   Future<void> _initializeCamera() async {
@@ -34,7 +49,7 @@ class _CameraPageState extends State<CameraPage> {
         );
         return;
       }
-      
+
       _controller = CameraController(
         cameras[0],
         ResolutionPreset.medium,
@@ -57,7 +72,7 @@ class _CameraPageState extends State<CameraPage> {
   Future<void> _takePicture() async {
     try {
       if (_controller == null || !_controller!.value.isInitialized) return;
-      
+
       final image = await _controller!.takePicture();
       setState(() {
         _imageFile = image;
@@ -107,11 +122,32 @@ class _CameraPageState extends State<CameraPage> {
                         ),
             ),
             const SizedBox(height: 20),
-            CameraButton(onPressed: _takePicture),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const SizedBox(width: 32), // 與右側IconButton的iconSize相同
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CameraButton(onPressed: _takePicture),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.photo_library),
+                  iconSize: 32,
+                  onPressed: () {
+                    // Navigator.pushNamed(context, '/upload');
+                    pickImage();
+                  },
+                ),
+              ],
+            ),
             const SizedBox(height: 40),
           ],
         ),
       ),
     );
   }
-} 
+}

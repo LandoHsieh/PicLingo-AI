@@ -21,6 +21,12 @@ class ProfilePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('個人資料'),
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () => Navigator.pushNamed(context, '/login'),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -49,12 +55,12 @@ class ProfilePage extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             // 個人資料表單
             ProfileEditForm(userData: mockUser),
-            
+
             const SizedBox(height: 16),
-            
+
             // 訂閱狀態
             SubscriptionStatus(
               tier: mockUser['tier'],
@@ -66,4 +72,4 @@ class ProfilePage extends StatelessWidget {
       ),
     );
   }
-} 
+}

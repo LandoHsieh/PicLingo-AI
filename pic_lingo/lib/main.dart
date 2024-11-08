@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       title: 'PicLingo',
       theme: AppTheme.lightTheme,
       // 關閉 debug 標籤
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: true,
       // 設定初始路由為登入頁面
       home: const LoginPage(),
       // home: const HomePage(),
@@ -39,9 +39,10 @@ class MyApp extends StatelessWidget {
           final args = ModalRoute.of(context)!.settings.arguments as XFile;
           return PhotoPreviewPage(imageFile: args);
         },
-        '/analysis': (context) => const AnalysisResultPage(imageUrl: "https://wallpapers.com/images/hd/cat-desktop-1920-x-1200-wallpaper-8uggswykdt2hzvxi.jpg"),
+        '/analysis': (context) => const AnalysisResultPage(
+            imageUrl:
+                "https://wallpapers.com/images/hd/cat-desktop-1920-x-1200-wallpaper-8uggswykdt2hzvxi.jpg"),
         '/profile': (context) => ProfilePage(),
-
       },
     );
   }

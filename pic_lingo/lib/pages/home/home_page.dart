@@ -9,20 +9,20 @@ class HomePage extends StatelessWidget {
 
   // 模擬從API獲取的用戶資料
   User get _mockUser => User(
-    id: 1,
-    username: "測試用戶",
-    email: "test@example.com",
-    tier: "free",
-    dailyCreditLimit: 10,
-    currentCredits: 7,
-    createdAt: DateTime.now().subtract(const Duration(days: 30)),
-    updatedAt: DateTime.now(),
-  );
+        id: 1,
+        username: "Lando",
+        email: "test@123.com",
+        tier: "free",
+        dailyCreditLimit: 10,
+        currentCredits: 7,
+        createdAt: DateTime.now().subtract(const Duration(days: 30)),
+        updatedAt: DateTime.now(),
+      );
 
   @override
   Widget build(BuildContext context) {
     final user = _mockUser;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text('你好，${user.username}'),
@@ -45,7 +45,7 @@ class HomePage extends StatelessWidget {
                 usedToday: 5, // 假資料
               ),
               const SizedBox(height: 24),
-              
+
               // 最新照片區域
               Text(
                 '最近的學習記錄',
@@ -54,7 +54,7 @@ class HomePage extends StatelessWidget {
               const SizedBox(height: 16),
               const RecentPhotoThumbnail(),
               const SizedBox(height: 24),
-              
+
               // 方案升級按鈕
               const PlanUpgradeButton(
                 currentPlan: '免費方案', // 假資料
@@ -90,4 +90,4 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
-} 
+}
